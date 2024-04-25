@@ -1,11 +1,9 @@
-
 "use client";
 
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-
 
 export function useBackPath(currentResource: string) {
   const pathname = usePathname();
@@ -17,18 +15,16 @@ export function useBackPath(currentResource: string) {
   return backPath;
 }
 
-export function BackButton({
-  currentResource,
-}: {
-  /* must be in kebab-case */
-  currentResource: string;
-}) {
-  const backPath = useBackPath(currentResource);
+export function BackButton() {
+  const router = useRouter();
   return (
-    <Button variant={"ghost"} asChild>
-      <Link href={backPath}>
-        <ChevronLeftIcon />
-      </Link>
+    <Button
+      variant={"ghost"}
+      onClick={() => {
+        router.back();
+      }}
+    >
+      <ChevronLeftIcon />
     </Button>
   );
 }

@@ -1,25 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-import { cn } from "@/lib/utils";
-import { type Post, CompletePost } from "@/lib/db/schema/posts";
 import Modal from "@/components/shared/Modal";
+import { type Post, CompletePost } from "@/lib/db/schema/posts";
 
 import { useOptimisticPosts } from "@/app/(app)/posts/useOptimisticPosts";
 import { Button } from "@/components/ui/button";
-import PostForm from "./PostForm";
 import { PlusIcon } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import PostCard from "./PostCard";
+import PostForm from "./PostForm";
 
 type TOpenModal = (post?: Post) => void;
 
@@ -55,58 +45,15 @@ export default function PostList({ posts }: { posts: CompletePost[] }) {
       {optimisticPosts.length === 0 ? (
         <EmptyState openModal={openModal} />
       ) : (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
           {optimisticPosts.map((post) => (
-            <Post post={post} key={post.id} openModal={openModal} />
+            <PostCard post={post} key={post.id} />
           ))}
         </div>
       )}
     </div>
   );
 }
-
-const Post = ({
-  post,
-  openModal,
-}: {
-  post: CompletePost;
-  openModal: TOpenModal;
-}) => {
-  const colors = useMemo(() => post.colors.split("-"), [post.colors]);
-
-  const optimistic = post.id === "optimistic";
-  const deleting = post.id === "delete";
-  const mutating = optimistic || deleting;
-  const pathname = usePathname();
-  const basePath = pathname.includes("posts") ? pathname : pathname + "/posts/";
-
-  return (
-    <Card className={cn(mutating ? "opacity-30 animate-pulse" : "")}>
-      <CardHeader>
-        <CardTitle>{post.title}</CardTitle>
-        <CardDescription>{post.desc}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex rounded-md overflow-hidden shadow-md w-full h-32 justify-stretch items-stretch">
-          {colors.map((color) => {
-            return (
-              <div
-                key={color}
-                style={{ backgroundColor: color }}
-                className="w-full h-full"
-              />
-            );
-          })}
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-end">
-        <Button variant={"outline"} asChild>
-          <Link href={basePath + "/" + post.id}>Edit</Link>
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-};
 
 const EmptyState = ({ openModal }: { openModal: TOpenModal }) => {
   return (

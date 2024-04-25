@@ -13,7 +13,7 @@ export default async function PostsPage() {
     <main>
       <div className="relative">
         <div className="flex justify-between">
-          <h1 className="font-semibold text-2xl my-2">Posts</h1>
+          <h1 className="font-semibold text-2xl my-2">My Posts</h1>
         </div>
         <Posts />
       </div>
@@ -22,13 +22,11 @@ export default async function PostsPage() {
 }
 
 const Posts = async () => {
-  await checkAuth();
-
   const { posts } = await getPosts();
-  
+
   return (
     <Suspense fallback={<Loading />}>
-      <PostList posts={posts}  />
+      <PostList posts={posts} />
     </Suspense>
   );
 };

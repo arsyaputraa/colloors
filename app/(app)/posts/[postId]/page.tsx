@@ -26,7 +26,7 @@ export default async function PostPage({
 }
 
 const Post = async ({ id }: { id: string }) => {
-  await checkAuth();
+  
 
   const { post } = await getPostById(id);
   
@@ -35,7 +35,7 @@ const Post = async ({ id }: { id: string }) => {
   return (
     <Suspense fallback={<Loading />}>
       <div className="relative">
-        <BackButton currentResource="posts" />
+        <BackButton  />
         <OptimisticPost post={post}  />
       </div>
     </Suspense>

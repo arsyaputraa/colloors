@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -14,18 +14,16 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useBackPath } from "@/components/shared/BackButton";
 
-
-
 import { type Post, insertPostParams } from "@/lib/db/schema/posts";
 import {
   createPostAction,
   deletePostAction,
   updatePostAction,
 } from "@/lib/actions/posts";
-
+import { PlusIcon, XIcon } from "lucide-react";
+import MultiColorsInput from "../ui/multi-colors-input";
 
 const PostForm = ({
-  
   post,
   openModal,
   closeModal,
@@ -33,7 +31,7 @@ const PostForm = ({
   postSuccess,
 }: {
   post?: Post | null;
-  
+
   openModal?: (post?: Post) => void;
   closeModal?: () => void;
   addOptimistic?: TAddOptimistic;
@@ -42,17 +40,16 @@ const PostForm = ({
   const { errors, hasErrors, setErrors, handleChange } =
     useValidatedForm<Post>(insertPostParams);
   const editing = !!post?.id;
-  
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [pending, startMutation] = useTransition();
 
   const router = useRouter();
   const backpath = useBackPath("posts");
 
-
   const onSuccess = (
     action: Action,
-    data?: { error: string; values: Post },
+    data?: { error: string; values: Post }
   ) => {
     const failed = Boolean(data?.error);
     if (failed) {
@@ -72,7 +69,7 @@ const PostForm = ({
     setErrors(null);
 
     const payload = Object.fromEntries(data.entries());
-    const postParsed = await insertPostParams.safeParseAsync({  ...payload });
+    const postParsed = await insertPostParams.safeParseAsync({ ...payload });
     if (!postParsed.success) {
       setErrors(postParsed?.error.flatten().fieldErrors);
       return;
@@ -89,10 +86,11 @@ const PostForm = ({
     };
     try {
       startMutation(async () => {
-        addOptimistic && addOptimistic({
-          data: pendingPost,
-          action: editing ? "update" : "create",
-        });
+        addOptimistic &&
+          addOptimistic({
+            data: pendingPost,
+            action: editing ? "update" : "create",
+          });
 
         const error = editing
           ? await updatePostAction({ ...values, id: post.id })
@@ -100,11 +98,11 @@ const PostForm = ({
 
         const errorFormatted = {
           error: error ?? "Error",
-          values: pendingPost 
+          values: pendingPost,
         };
         onSuccess(
           editing ? "update" : "create",
-          error ? errorFormatted : undefined,
+          error ? errorFormatted : undefined
         );
       });
     } catch (e) {
@@ -117,11 +115,11 @@ const PostForm = ({
   return (
     <form action={handleSubmit} onChange={handleChange} className={"space-y-8"}>
       {/* Schema fields start */}
-              <div>
+      <div>
         <Label
           className={cn(
             "mb-2 inline-block",
-            errors?.title ? "text-destructive" : "",
+            errors?.title ? "text-destructive" : ""
           )}
         >
           Title
@@ -138,11 +136,11 @@ const PostForm = ({
           <div className="h-6" />
         )}
       </div>
-        <div>
+      <div>
         <Label
           className={cn(
             "mb-2 inline-block",
-            errors?.desc ? "text-destructive" : "",
+            errors?.desc ? "text-destructive" : ""
           )}
         >
           Desc
@@ -159,11 +157,20 @@ const PostForm = ({
           <div className="h-6" />
         )}
       </div>
-        <div>
+
+      <MultiColorsInput
+        colorString={post?.colors ?? ""}
+        errors={errors}
+        name="colors"
+        returnType="string"
+      />
+      {/* Dynamic Color Inputs */}
+
+      {/* <div>
         <Label
           className={cn(
             "mb-2 inline-block",
-            errors?.colors ? "text-destructive" : "",
+            errors?.colors ? "text-destructive" : ""
           )}
         >
           Colors
@@ -179,7 +186,7 @@ const PostForm = ({
         ) : (
           <div className="h-6" />
         )}
-      </div>
+      </div> */}
       {/* Schema fields end */}
 
       {/* Save Button */}

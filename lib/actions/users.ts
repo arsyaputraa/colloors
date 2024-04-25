@@ -23,7 +23,7 @@ interface ActionResult {
 
 export async function signInAction(
   _: ActionResult,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionResult> {
   const { data, error } = validateAuthFormData(formData);
   if (error !== null) return { error };
@@ -41,7 +41,7 @@ export async function signInAction(
 
     const validPassword = await new Argon2id().verify(
       existingUser.hashedPassword,
-      data.password,
+      data.password
     );
     if (!validPassword) {
       return {
@@ -61,7 +61,7 @@ export async function signInAction(
 
 export async function signUpAction(
   _: ActionResult,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionResult> {
   const { data, error } = validateAuthFormData(formData);
 
@@ -75,6 +75,7 @@ export async function signUpAction(
       id: userId,
       email: data.email,
       hashedPassword,
+      name: data.email.split("@")[0] ?? "",
     });
   } catch (e) {
     return genericError;
@@ -103,7 +104,7 @@ export async function signOutAction(): Promise<ActionResult> {
 
 export async function updateUser(
   _: any,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionResult & { success?: boolean }> {
   const { session } = await getUserAuth();
   if (!session) return { error: "Unauthorised" };
@@ -131,4 +132,3 @@ export async function updateUser(
     return genericError;
   }
 }
-
